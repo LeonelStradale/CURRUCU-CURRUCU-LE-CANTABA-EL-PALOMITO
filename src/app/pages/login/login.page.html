@@ -1,0 +1,59 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="login-container">
+    <ion-list>
+      <ion-item>
+        <ion-icon slot="start" name="person-outline"></ion-icon>
+        <ion-input [(ngModel)]="user"  label="Email" labelPlacement="floating" placeholder="Enter your email" type="email">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+        <ion-input [(ngModel)]="pass" type="password" label="Password" labelPlacement="floating" placeholder="Enter your password">
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button (click)="login()" expand="block" class="ion-margin-top">Login</ion-button>
+
+    <ion-text class="ion-text-center ion-margin-top">
+      <a href="/forgot-password">Forgot your password?</a>
+    </ion-text>
+  </div>
+</ion-content>
+
+<!-- Añade este CSS al archivo de estilos para personalizar la apariencia -->
+<style>
+  .login-container {
+    max-width: 400px;
+    margin: auto;
+    padding: 2rem 1rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  ion-input {
+    --padding-start: 1rem;
+  }
+
+  ion-button {
+    --background: #3880ff;
+  }
+
+  ion-text a {
+    color: #3880ff;
+    text-decoration: none;
+  }
+
+  ion-text a:hover {
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,30 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Horarios</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-datetime
+    locale="es-ES"
+    hourCycle="h12"
+    [firstDayOfWeek]="1"
+    [isDateEnabled]="isWeekday"
+    min="2024-07-01T00:00:00"
+    max="2024-08-01T16:00:00"
+    value="2024-07-02T15:00:00"
+    minuteValues="0,15,30,45"
+    [highlightedDates]="highlightedDates"
+  >
+    <span slot="title">Selecciona el día para tu reservación</span>
+    <span slot="time-label">Tiempo</span>
+      <ion-buttons slot="buttons">
+        <ion-button color="danger">Reset</ion-button>
+        <ion-button color="primary">Never mind</ion-button>
+        <ion-button color="primary">All Set</ion-button>
+      </ion-buttons>
+  </ion-datetime>
+</ion-content>
