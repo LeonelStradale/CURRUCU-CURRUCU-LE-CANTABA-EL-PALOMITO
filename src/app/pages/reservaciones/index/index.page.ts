@@ -142,6 +142,20 @@ export class IndexPage implements OnInit {
     });
     
   }
+
+  // Nueva función para eliminar una reservación
+  deleteReservation(id: number) {
+    this.api.deleteReservation(this.token, id).subscribe({
+      next: () => {
+        this.presentToast('top', 'Reservación eliminada exitosamente', 'success');
+        this.detalles = this.detalles.filter(item => item.id !== id);
+      },
+      error: (error: any) => {
+        console.log('Error al eliminar la reservación:', error);
+        this.presentToast('top', 'Ocurrió un error al eliminar la reservación', 'danger');
+      },
+    });
+  }
   
   
 

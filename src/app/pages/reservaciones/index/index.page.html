@@ -36,6 +36,10 @@
           {{ item.attributes.details }}
         </p>
       </ion-label>
+
+      <ion-button fill="clear" color="danger" slot="end" (click)="deleteReservation(item.id)">
+      <ion-icon name="trash-outline"></ion-icon>
+    </ion-button>
     </ion-item>
   </ion-list>
 

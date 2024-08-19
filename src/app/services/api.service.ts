@@ -46,4 +46,20 @@ export class ApiService {
       headers: { Authorization: 'bearer ' + token },
     });  
   }
+
+  deleteReservation(token: string, id: number) {
+    return this.http.delete(`${this.url}/reservations/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+
+  updateReservation(token: string, reservationId: string, reservationData: any) {
+    return this.http.put(`${this.url}/reservations/${reservationId}`, reservationData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+  
+  
 }
