@@ -16,8 +16,8 @@ export class LoginPage implements OnInit {
     private api: ApiService
   ) {}
   
-  user = '';
-  pass = '';
+  user = 'edgarleonel@gmail.com';
+  pass = 'Juni1200';
 
   async ngOnInit() {
     await this.storage.create();

@@ -14,16 +14,12 @@ export class IndexPage implements OnInit {
   details: any;
   citas: any[] = [];
   highlightedDates = [{}];
-
   servicios: any[] = [];
   selectedServiceId: string | null = null;
   selectedDate: string | null = null;
-
+  selectedReservation: any = null;
   isModalOpen = false;
-
-  setOpen(isOpen: boolean) {
-    this.isModalOpen = isOpen;
-  }
+  isEditModalOpen = false;
 
   constructor(
     private toast: ToastController,
@@ -41,7 +37,18 @@ export class IndexPage implements OnInit {
       this.presentToast('top', 'Token no encontrado', 'warning');
     }
 
-    this.getServicios()
+    this.getServicios();
+  }
+
+  setOpen(isOpen: boolean) {
+    this.isModalOpen = isOpen;
+    this.selectedServiceId = null;
+    this.details = null;
+    this.selectedDate = null;
+  }
+
+  setEditOpen(isOpen: boolean) {
+    this.isEditModalOpen = isOpen;
   }
 
   getServicios() {
@@ -107,13 +114,23 @@ export class IndexPage implements OnInit {
 
   async saveReservation() {
     const userId = await this.storage.get('userId'); // Obtener el ID del usuario del almacenamiento
-  
-    if (!userId || !this.selectedServiceId || !this.selectedDate || !this.details) {
-      console.log(userId, this.selectedServiceId, this.selectedDate, this.details);
+
+    if (
+      !userId ||
+      !this.selectedServiceId ||
+      !this.selectedDate ||
+      !this.details
+    ) {
+      console.log(
+        userId,
+        this.selectedServiceId,
+        this.selectedDate,
+        this.details
+      );
       this.presentToast('top', 'Por favor completa todos los campos', 'danger');
       return;
     }
-  
+
     const reservationData = {
       data: {
         users_permissions_user: userId, // Usar el ID del usuario autenticado
@@ -122,42 +139,139 @@ export class IndexPage implements OnInit {
         details: this.details,
       },
     };
-  
+
     console.log(reservationData);
 
     this.api.saveReservation(this.token, reservationData).subscribe({
       next: (res: any) => {
-        this.presentToast('top', 'Reservación guardada exitosamente', 'success');
+        this.presentToast(
+          'top',
+          'Reservación guardada exitosamente',
+          'success'
+        );
         this.setOpen(false); // Cierra el modal
         this.getReservations(); // Actualiza la lista de reservaciones
       },
       error: (error: any) => {
         console.log('Error al guardar la reservación:', error);
         if (error.status === 400) {
-          this.presentToast('top', 'Solicitud inválida: ' + error.error.message, 'danger');
+          this.presentToast(
+            'top',
+            'Solicitud inválida: ' + error.error.message,
+            'danger'
+          );
         } else {
-          this.presentToast('top', 'Ocurrió un error al guardar la reservación', 'danger');
+          this.presentToast(
+            'top',
+            'Ocurrió un error al guardar la reservación',
+            'danger'
+          );
         }
       },
     });
-    
+  }
+
+  editReservation(item: any) {
+    this.selectedReservation = item;
+    console.log(item);
+    // Establece los valores en el modal de edición con la información existente
+    this.selectedServiceId = item.attributes.servicie.data.id;
+    this.selectedDate = item.attributes.appointment.join('T');
+    this.details = item.attributes.details;
+
+    // Abre el modal de edición
+    this.setEditOpen(true);
+  }
+
+  async updateReservation() {
+    const userId = await this.storage.get('userId');
+
+    if (
+      !userId ||
+      !this.selectedServiceId ||
+      !this.selectedDate ||
+      !this.details
+    ) {
+      this.presentToast('top', 'Por favor completa todos los campos', 'danger');
+      return;
+    }
+
+    const reservationData = {
+      data: {
+        users_permissions_user: userId,
+        servicie: this.selectedServiceId,
+        appointment: this.selectedDate,
+        details: this.details,
+      },
+    };
+
+    if (this.selectedReservation) {
+      // Editar reservación existente
+      this.api
+        .updateReservation(
+          this.token,
+          this.selectedReservation.id,
+          reservationData
+        )
+        .subscribe({
+          next: (res: any) => {
+            this.presentToast(
+              'top',
+              'Reservación actualizada exitosamente',
+              'success'
+            );
+
+            const index = this.citas.indexOf(this.selectedReservation);
+            if (index > -1) {
+              this.citas.splice(index, 1);
+            }
+
+            const index2 = this.detalles.indexOf(this.selectedReservation);
+            if (index2 > -1) {
+              this.detalles.splice(index2, 1);
+            }
+
+            this.setEditOpen(false); // Cierra el modal de edición
+            this.getReservations();
+            this.selectedReservation = null; // Resetea la selección
+          },
+          error: (error: any) => {},
+        });
+    }
   }
 
   // Nueva función para eliminar una reservación
-  deleteReservation(id: number) {
-    this.api.deleteReservation(this.token, id).subscribe({
+  deleteReservation(item: any) {
+    this.api.deleteReservation(this.token, item.id).subscribe({
       next: () => {
-        this.presentToast('top', 'Reservación eliminada exitosamente', 'success');
-        this.detalles = this.detalles.filter(item => item.id !== id);
+        this.presentToast(
+          'top',
+          'Reservación eliminada exitosamente',
+          'success'
+        );
+
+        const index = this.citas.indexOf(item);
+        if (index > -1) {
+          this.citas.splice(index, 1);
+        }
+
+        const index2 = this.detalles.indexOf(item);
+        if (index2 > -1) {
+          this.detalles.splice(index2, 1);
+        }
+
+        this.detalles = this.detalles.filter((item) => item.id !== item.id);
       },
       error: (error: any) => {
         console.log('Error al eliminar la reservación:', error);
-        this.presentToast('top', 'Ocurrió un error al eliminar la reservación', 'danger');
+        this.presentToast(
+          'top',
+          'Ocurrió un error al eliminar la reservación',
+          'danger'
+        );
       },
     });
   }
-  
-  
 
   dateChange($event: any) {
     // console.log($event.detail.value);
@@ -171,6 +285,4 @@ export class IndexPage implements OnInit {
       }
     });
   }
-
-
 }

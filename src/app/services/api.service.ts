@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -51,8 +52,8 @@ export class ApiService {
     return this.http.delete(`${this.url}/reservations/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-  }
-
+  }  
+  
   updateReservation(token: string, reservationId: string, reservationData: any) {
     return this.http.put(`${this.url}/reservations/${reservationId}`, reservationData, {
       headers: {
@@ -60,6 +61,4 @@ export class ApiService {
       },
     });
   }
-  
-  
 }
